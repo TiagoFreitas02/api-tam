@@ -30,7 +30,7 @@ def about():
         resultados = cursor.fetchall()
 
         # Monta uma string simples para exibir
-        html = "<h1>Usuários</h1><ul>"
+        html = "<h1>Utilizadores</h1><ul>"
         for nome, email in resultados:
             html += f"<li>{nome} — {email}</li>"
         html += "</ul>"
