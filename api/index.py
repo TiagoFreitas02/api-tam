@@ -16,33 +16,9 @@ db_config = {
 def home():
     return 'Hello, GNUNO!'
 
-@app.route('/about')
-def about():
-    try:
-        # Conecta ao banco
-        conn = psycopg2.connect(**db_config)
-        cursor = conn.cursor()
-
-        # Executa um SELECT
-        cursor.execute("SELECT nome, email FROM utilizadores LIMIT 5;")
-
-        # Busca os resultados
-        resultados = cursor.fetchall()
-
-        # Monta uma string simples para exibir
-        html = "<h1>Utilizadores</h1><ul>"
-        for nome, email in resultados:
-            html += f"<li>{nome} — {email}</li>"
-        html += "</ul>"
-
-        return html
-
-    except Exception as e:
-        return f"Erro ao acessar o banco: {e}"
-
-    finally:
-        # Fecha conexão
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
+@app.route('/luz', methods=['POST'])
+def receber_luz():
+    data = request.get_json()
+    light_value = data.get('light_value')
+    print(f"Valor recebido: {light_value}")
+    return jsonify({"status": "ok", "light_value": light_value})
