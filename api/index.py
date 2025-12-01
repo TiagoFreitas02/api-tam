@@ -17,7 +17,7 @@ def save_light_value(light_value):
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO luz (light_value) VALUES (%s)
+                    INSERT INTO luz (valor) VALUES (%s)
                 """, (light_value,))
         return True
     except Exception as e:
