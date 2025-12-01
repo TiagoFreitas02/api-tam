@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 import os
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'mysecretkey')
@@ -12,13 +13,44 @@ db_config = {
     'host': os.environ.get('DATABASE_HOST')
 }
 
-@app.route('/')
-def home():
-    return 'Hello, GNUNO!'
+def save_light_value(light_value):
+    try:
+        # Conecta ao banco de dados
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                # Cria a tabela se não existir
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS luz (
+                        id SERIAL PRIMARY KEY,
+                        light_value FLOAT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                # Insere o valor recebido
+                cur.execute("""
+                    INSERT INTO luz (light_value) VALUES (%s)
+                """, (light_value,))
+        # Commit é feito automaticamente pelo contexto
+        return True
+    except Exception as e:
+        print(f"Erro ao salvar no banco: {e}")
+        return False
+
 
 @app.route('/luz', methods=['POST'])
 def receber_luz():
     data = request.get_json()
     light_value = data.get('light_value')
-    print(f"Valor recebido: {light_value}")
-    return jsonify({"status": "ok", "light_value": light_value})
+
+    if light_value is None:
+        return jsonify({"status": "error", "message": "light_value não fornecido"}), 400
+
+    success = save_light_value(light_value)
+
+    if success:
+        return jsonify({"status": "ok", "light_value": light_value})
+    else:
+        return jsonify({"status": "error", "message": "Erro ao salvar no banco"}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
