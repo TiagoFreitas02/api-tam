@@ -21,7 +21,7 @@ def save_light_value(light_value):
                 """, (light_value,))
         return True
     except Exception as e:
-        print(f"Erro ao salvar na BD: {e}")
+        print(f"Erro ao guardar na BD: {e}")
         return False
 
 
@@ -31,14 +31,14 @@ def receber_luz():
     light_value = data.get('light_value')
 
     if light_value is None:
-        return jsonify({"status": "error", "message": "light_value não fornecido"}), 400
+        return jsonify({"status": "error", "message": "light_value não obtido"}), 400
 
     success = save_light_value(light_value)
 
     if success:
         return jsonify({"status": "ok", "light_value": light_value})
     else:
-        return jsonify({"status": "error", "message": "Erro ao salvar na BD"}), 500
+        return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
