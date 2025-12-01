@@ -16,15 +16,6 @@ def save_light_value(light_value):
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                # Cria a tabela se não existir
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS luz (
-                        id SERIAL PRIMARY KEY,
-                        light_value FLOAT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                # Insere o valor de luz com a data atual automaticamente
                 cur.execute("""
                     INSERT INTO luz (light_value) VALUES (%s)
                 """, (light_value,))
