@@ -24,9 +24,6 @@ def save_light_value(light_value):
         print(f"Erro ao salvar na BD: {e}")
         return False
 
-@app.route('/')
-def home():
-    return 'Hello, GNUNO!'
 
 @app.route('/luz', methods=['POST'])
 def receber_luz():
