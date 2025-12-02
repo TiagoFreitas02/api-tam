@@ -5,7 +5,7 @@ import psycopg2
 app = Flask(__name__)
 
 db_config = {
-    'dbname':('db2021153107'),
+    'dbname':'db2021153107',
     'user': os.environ.get('DATABASE_USER'),
     'password': 'a2021153107',
     'host': os.environ.get('DATABASE_HOST')
