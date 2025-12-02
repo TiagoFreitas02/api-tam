@@ -7,7 +7,7 @@ app = Flask(__name__)
 db_config = {
     'dbname': os.environ.get('DATABASE_NAME'),
     'user': os.environ.get('DATABASE_USER'),
-    'password': os.environ.get('DATABASE_PASSWORD'),
+    'password': os.environ.get('a2021153107'),
     'host': os.environ.get('DATABASE_HOST')
 }
 
