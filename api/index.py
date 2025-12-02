@@ -47,9 +47,7 @@ def receber_luz():
         return jsonify({"status": "ok", "light_value": light_value})
     else:
         return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
-
-# >>> NOVO: endpoint para mostrar os valores no HTML
-
+    
 @app.route('/luz_html')
 def mostrar_luz():
     valores = [100, 200, 300]  # lista de teste
