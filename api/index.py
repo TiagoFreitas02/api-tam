@@ -26,7 +26,7 @@ def get_light_values():
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT valor FROM luz ORDER BY id DESC")  # Ordena do mais recente
+                cur.execute("SELECT valor FROM luz")  # Ordena do mais recente
                 results = cur.fetchall()
         return [r[0] for r in results]  # Retorna só os valores
     except Exception as e:
@@ -53,7 +53,6 @@ def receber_luz():
 def mostrar_luz():
     valores = get_light_values()  # >>> busca os valores da tabela
     return render_template("luz.html", valores=valores)  # >>> renderiza o template HTML
-
 
 if __name__ == '__main__':
     app.run(debug=True)
