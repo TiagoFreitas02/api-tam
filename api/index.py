@@ -3,7 +3,6 @@ import os
 import psycopg2
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'mysecretkey')
 
 db_config = {
     'dbname': os.environ.get('DATABASE_NAME'),
@@ -16,14 +15,11 @@ def save_light_value(light_value):
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO luz (valor) VALUES (%s)
-                """, (light_value,))
+                cur.execute("INSERT INTO luz (valor) VALUES (%s)", (light_value,))
         return True
     except Exception as e:
         print(f"Erro ao guardar na BD: {e}")
         return False
-
 
 @app.route('/luz', methods=['POST'])
 def receber_luz():
