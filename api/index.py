@@ -7,7 +7,7 @@ app = Flask(__name__)
 db_config = {
     'dbname': os.environ.get('DATABASE_NAME'),
     'user': os.environ.get('DATABASE_USER'),
-    'password': os.environ.get('DATABASE_PASSWORD'),
+    'password': 'a2021153107',
     'host': os.environ.get('DATABASE_HOST')
 }
 
@@ -24,9 +24,10 @@ def save_light_value(light_value):
 # >>> NOVO: função para buscar valores da tabela
 def get_light_values():
     try:
+        print("Tentando conectar com:", db_config)  # debug
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT valor FROM luz ORDER BY id DESC")  # pega os valores do mais recente
+                cur.execute("SELECT valor FROM luz ORDER BY id DESC")
                 results = cur.fetchall()
         return [r[0] for r in results]
     except Exception as e:
