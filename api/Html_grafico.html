@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Valores de Luz</title>
+</head>
+<body>
+    <h1>Valores de Luz</h1>
+    <ul>
+        <!-- >>> NOVO: loop que percorre a lista de valores e cria um <li> para cada -->
+        {% for valor in valores %}
+            <li>{{ valor }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
