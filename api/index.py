@@ -21,14 +21,14 @@ def save_light_value(light_value):
         print(f"Erro ao guardar na BD: {e}")
         return False
 
+# >>> NOVO: função para buscar valores da tabela
 def get_light_values():
-    """Procura todos os valores da coluna 'valor'."""
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT valor FROM luz")  # Ordena do mais recente
+                cur.execute("SELECT valor FROM luz ORDER BY id DESC")  # pega os valores do mais recente
                 results = cur.fetchall()
-        return [r[0] for r in results]  # Retorna só os valores
+        return [r[0] for r in results]
     except Exception as e:
         print(f"Erro ao pesquisar na BD: {e}")
         return []
@@ -51,8 +51,8 @@ def receber_luz():
 # >>> NOVO: endpoint para mostrar os valores no HTML
 @app.route('/luz_html')
 def mostrar_luz():
-    valores = get_light_values()  # >>> busca os valores da tabela
-    return render_template("luz.html", valores=valores)  # >>> renderiza o template HTML
+    valores = get_light_values()  # busca os valores da tabela
+    return render_template("luz.html", valores=valores)  # renderiza o template HTML
 
 if __name__ == '__main__':
     app.run(debug=True)
