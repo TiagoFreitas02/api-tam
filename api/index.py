@@ -48,7 +48,7 @@ def receber_luz():
         return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
 
 
-@app.route('/luz_html')
+@app.route('/')
 def mostrar_luz():
     valores = get_light_values()  
     return render_template("luz.html", valores=valores) 
