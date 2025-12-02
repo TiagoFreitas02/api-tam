@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 db_config = {
     'dbname': 'bd2021153107',
-    'user': os.environ.get('DATABASE_USER'),
+    'user': 'postgres',
     'password': 'a2021153107',
     'host': os.environ.get('DATABASE_HOST')
 }
