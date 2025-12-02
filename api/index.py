@@ -5,10 +5,10 @@ import psycopg2
 app = Flask(__name__)
 
 db_config = {
-    'dbname': os.environ.get('DATABASE_NAME'),
-    'user': os.environ.get('DATABASE_USER'),
-    'password': os.environ.get('DATABASE_PASSWORD'),
-    'host': os.environ.get('DATABASE_HOST')
+    'dbname': 'DATABASE_NAME',
+    'user': 'a2021153107',
+    'password':'a2021153107',
+    'host': 'aid.estgoh.ipc.pt'
 }
 
 def save_light_value(light_value):
