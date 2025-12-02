@@ -47,11 +47,13 @@ def receber_luz():
         return jsonify({"status": "ok", "light_value": light_value})
     else:
         return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
-    
+
+# >>> NOVO: endpoint para mostrar os valores no HTML
 @app.route('/luz_html')
 def mostrar_luz():
-    valores = [100, 200, 300]  # lista de teste
-    return render_template("luz.html", valores=valores)
+    valores = get_light_values()  # >>> busca os valores da tabela
+    return render_template("luz.html", valores=valores)  # >>> renderiza o template HTML
+
 
 if __name__ == '__main__':
     app.run(debug=True)
