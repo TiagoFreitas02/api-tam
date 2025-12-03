@@ -7,7 +7,7 @@
     {% for valor, ts in valores %}
     <tr>
         <td>{{ valor }}</td>
-        <td>{{ ts }}</td>
+        <td>{{ ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
     </tr>
     {% endfor %}
 </table>
