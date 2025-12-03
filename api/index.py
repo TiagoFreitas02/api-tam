@@ -25,7 +25,7 @@ def get_light_values():
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT valor, timestamp FROM luz ORDER BY id DESC") 
+                cur.execute("SELECT valor, data FROM luz ORDER BY id DESC") 
                 results = cur.fetchall()
         return results  # agora devolve lista de (valor, timestamp)
     except Exception as e:
