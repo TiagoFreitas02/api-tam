@@ -25,12 +25,13 @@ def get_light_values():
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT valor FROM luz ORDER BY id DESC") 
+                cur.execute("SELECT valor, timestamp FROM luz ORDER BY id DESC") 
                 results = cur.fetchall()
-        return [r[0] for r in results]
+        return results  # agora devolve lista de (valor, timestamp)
     except Exception as e:
         print(f"Erro ao pesquisar na BD: {e}")
         return []
+
 
 @app.route('/luz', methods=['POST'])
 def receber_luz():
@@ -50,8 +51,9 @@ def receber_luz():
 
 @app.route('/')
 def mostrar_luz():
-    valores = get_light_values()  
-    return render_template("luz.html", valores=valores) 
+    valores = get_light_values()
+    return render_template("luz.html", valores=valores)
+ 
 
 if __name__ == '__main__':
     app.run(debug=True)
