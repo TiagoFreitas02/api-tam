@@ -76,6 +76,52 @@ def receber_luz():
         return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
 
 
+
+
+@app.route('/estado', methods=['GET'])
+def comando_led():
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                # Pega o último estado do LED
+                cur.execute('SELECT estado FROM "LED" ORDER BY id DESC LIMIT 1')
+                result = cur.fetchone()
+
+        estado = result[0] if result else False
+        return jsonify({"led": estado})
+    except Exception as e:
+        print(f"Erro ao buscar comando do LED: {e}")
+        return jsonify({"led": False, "error": "Falha no servidor"})
+
+
+
+@app.route('/desliga_led', methods=['POST'])
+def desliga_led():
+    try:
+        # 1️⃣ Pegar o último estado do LED
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute('SELECT estado FROM "LED" ORDER BY id DESC LIMIT 1')
+                result = cur.fetchone()
+
+        if result and result[0]:  # Se o LED está ligado
+            # 2️⃣ Inserir False na tabela LED para desligar
+            save_led_state(False)
+            message = "LED desligado."
+        else:
+            message = "LED já estava desligado."
+
+        # 3️⃣ Redireciona de volta à página principal
+        valores = get_light_values()
+        return render_template("luz.html", valores=valores, msg=message)
+
+    except Exception as e:
+        print(f"Erro ao desligar LED: {e}")
+        valores = get_light_values()
+        return render_template("luz.html", valores=valores, msg="Erro ao desligar LED")
+
+
+
 @app.route('/')
 def mostrar_luz():
     valores = get_light_values()
