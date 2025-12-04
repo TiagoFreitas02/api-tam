@@ -31,15 +31,16 @@ def get_light_values():
     except Exception as e:
         print(f"Erro ao pesquisar na BD: {e}")
         return []
-
+    
 def save_led_state(state: bool):
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("INSERT INTO led (estado) VALUES (%s)", (state,))
+                # Atualiza o estado em vez de inserir
+                cur.execute("UPDATE led SET estado = %s WHERE id = 1", (state,))
         return True
     except Exception as e:
-        print(f"Erro ao guardar estado do led na BD: {e}")
+        print(f"Erro ao atualizar estado do led na BD: {e}")
         return False
 
 
@@ -83,8 +84,7 @@ def comando_led():
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                # Pega o último estado do LED
-                cur.execute('SELECT estado FROM led ORDER BY id DESC LIMIT 1')
+                cur.execute('SELECT estado FROM led WHERE id = 1')
                 result = cur.fetchone()
 
         estado = result[0] if result else False
@@ -95,22 +95,22 @@ def comando_led():
 
 
 
+
 @app.route('/toggle_led', methods=['POST'])
 def toggle_led():
     try:
-        # 1️⃣ Busca último estado do LED na tabela
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT estado FROM led ORDER BY id DESC LIMIT 1')
+                cur.execute('SELECT estado FROM led WHERE id = 1')
                 result = cur.fetchone()
         
         estado_atual = result[0] if result else False
         novo_estado = not estado_atual  # alterna o estado
 
-        # 2️⃣ Salva o novo estado na BD
+        # Atualiza o estado
         save_led_state(novo_estado)
 
-        # 3️⃣ Atualiza página com mensagem
+        # Atualiza página
         valores = get_light_values()
         msg = f"LED {'ligado' if novo_estado else 'desligado'}"
         return render_template("luz.html", valores=valores, msg=msg)
@@ -119,6 +119,7 @@ def toggle_led():
         print(f"Erro ao alternar LED: {e}")
         valores = get_light_values()
         return render_template("luz.html", valores=valores, msg="Erro ao alternar LED")
+
 
 
 
