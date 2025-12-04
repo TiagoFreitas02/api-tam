@@ -87,7 +87,7 @@ def comando_led():
                 cur.execute('SELECT estado FROM led WHERE id = 1')
                 result = cur.fetchone()
 
-        estado = result[0] if result else False
+        estado = result[0]
         return jsonify({"led": estado})
     except Exception as e:
         print(f"Erro ao buscar comando do LED: {e}")
