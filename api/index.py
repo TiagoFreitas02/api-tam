@@ -110,11 +110,7 @@ def toggle_led():
         # 2️⃣ Salva o novo estado na BD
         save_led_state(novo_estado)
 
-        # 3️⃣ Envia comando para o Arduino via Serial
-        cmd = "LED_ON\n" if novo_estado else "LED_OFF\n"
-        arduino.write(cmd.encode())
-
-        # 4️⃣ Atualiza página com mensagem
+        # 3️⃣ Atualiza página com mensagem
         valores = get_light_values()
         msg = f"LED {'ligado' if novo_estado else 'desligado'}"
         return render_template("luz.html", valores=valores, msg=msg)
@@ -123,6 +119,7 @@ def toggle_led():
         print(f"Erro ao alternar LED: {e}")
         valores = get_light_values()
         return render_template("luz.html", valores=valores, msg="Erro ao alternar LED")
+
 
 
 @app.route('/')
