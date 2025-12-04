@@ -36,10 +36,10 @@ def save_led_state(state: bool):
     try:
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("INSERT INTO LED (estado) VALUES (%s)", (state,))
+                cur.execute("INSERT INTO led (estado) VALUES (%s)", (state,))
         return True
     except Exception as e:
-        print(f"Erro ao guardar estado do LED na BD: {e}")
+        print(f"Erro ao guardar estado do led na BD: {e}")
         return False
 
 
