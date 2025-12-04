@@ -3,7 +3,7 @@ import requests
 import time
 
 API_LUZ_URL = "https://api-tam.vercel.app/luz"  # tabela luz
-API_LED_URL = "https://api-tam.vercel.app/LED"  # tabela led
+API_LED_URL = "https://api-tam.vercel.app/led"  # tabela led
 PORTA = "COM3"  
 BAUD = 9600
 
