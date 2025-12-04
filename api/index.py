@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template  # render_template adicionado para HTML
+from flask import Flask, request, jsonify, render_template 
 import os
 import psycopg2
 
@@ -57,4 +57,5 @@ def mostrar_luz():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
     
