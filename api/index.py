@@ -95,31 +95,34 @@ def comando_led():
 
 
 
-@app.route('/desliga_led', methods=['POST'])
-def desliga_led():
+@app.route('/toggle_led', methods=['POST'])
+def toggle_led():
     try:
-        # 1️⃣ Pegar o último estado do LED
+        # 1️⃣ Busca último estado do LED na tabela
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
                 cur.execute('SELECT estado FROM led ORDER BY id DESC LIMIT 1')
                 result = cur.fetchone()
+        
+        estado_atual = result[0] if result else False
+        novo_estado = not estado_atual  # alterna o estado
 
-        if result and result[0]:  # Se o LED está ligado
-            # 2️⃣ Inserir False na tabela LED para desligar
-            save_led_state(False)
-            message = "LED desligado."
-        else:
-            message = "LED já estava desligado."
+        # 2️⃣ Salva o novo estado na BD
+        save_led_state(novo_estado)
 
-        # 3️⃣ Redireciona de volta à página principal
+        # 3️⃣ Envia comando para o Arduino via Serial
+        cmd = "LED_ON\n" if novo_estado else "LED_OFF\n"
+        arduino.write(cmd.encode())
+
+        # 4️⃣ Atualiza página com mensagem
         valores = get_light_values()
-        return render_template("luz.html", valores=valores, msg=message)
+        msg = f"LED {'ligado' if novo_estado else 'desligado'}"
+        return render_template("luz.html", valores=valores, msg=msg)
 
     except Exception as e:
-        print(f"Erro ao desligar LED: {e}")
+        print(f"Erro ao alternar LED: {e}")
         valores = get_light_values()
-        return render_template("luz.html", valores=valores, msg="Erro ao desligar LED")
-
+        return render_template("luz.html", valores=valores, msg="Erro ao alternar LED")
 
 
 @app.route('/')

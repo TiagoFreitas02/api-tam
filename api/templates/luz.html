@@ -12,7 +12,11 @@
     {% endfor %}
 </table>
 
-<form action="/desliga_led" method="post">
+<form action="/toggle_led" method="post">
     <button type="submit">LED</button>
 </form>
+
+{% if msg %}
+<p>{{ msg }}</p>
+{% endif %}
 
