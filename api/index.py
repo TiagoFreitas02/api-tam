@@ -32,6 +32,33 @@ def get_light_values():
         print(f"Erro ao pesquisar na BD: {e}")
         return []
 
+def save_led_state(state: bool):
+    try:
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO LED (estado) VALUES (%s)", (state,))
+        return True
+    except Exception as e:
+        print(f"Erro ao guardar estado do LED na BD: {e}")
+        return False
+
+
+
+@app.route('/led', methods=['POST'])
+def receber_led():
+    data = request.get_json()
+    led_state = data.get('led_state')
+
+    if led_state is None:
+        return jsonify({"status": "error", "message": "led_state não obtido"}), 400
+
+    success = save_led_state(led_state)
+
+    if success:
+        return jsonify({"status": "ok", "led_state": led_state})
+    else:
+        return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
+
 
 @app.route('/luz', methods=['POST'])
 def receber_luz():
