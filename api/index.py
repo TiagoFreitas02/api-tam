@@ -121,8 +121,6 @@ def toggle_led():
         return render_template("luz.html", valores=valores, msg="Erro ao alternar LED")
 
 
-
-
 @app.route('/')
 def mostrar_luz():
     valores = get_light_values()
