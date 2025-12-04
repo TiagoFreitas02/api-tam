@@ -105,12 +105,14 @@ def toggle_led():
                 result = cur.fetchone()
         
         estado_atual = result[0] if result else False
-        novo_estado = not estado_atual  # alterna o estado
+        print("Estado atual:", estado_atual)  # DEBUG
+        novo_estado = not estado_atual
+        print("Novo estado:", novo_estado)  # DEBUG
 
         # Atualiza o estado
-        save_led_state(novo_estado)
+        sucesso = save_led_state(novo_estado)
+        print("Atualizou BD:", sucesso)  # DEBUG
 
-        # Atualiza página
         valores = get_light_values()
         msg = f"LED {'ligado' if novo_estado else 'desligado'}"
         return render_template("luz.html", valores=valores, msg=msg)
@@ -119,6 +121,7 @@ def toggle_led():
         print(f"Erro ao alternar LED: {e}")
         valores = get_light_values()
         return render_template("luz.html", valores=valores, msg="Erro ao alternar LED")
+
 
 
 @app.route('/')
