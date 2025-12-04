@@ -84,7 +84,7 @@ def comando_led():
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
                 # Pega o último estado do LED
-                cur.execute('SELECT estado FROM "LED" ORDER BY id DESC LIMIT 1')
+                cur.execute('SELECT estado FROM led ORDER BY id DESC LIMIT 1')
                 result = cur.fetchone()
 
         estado = result[0] if result else False
@@ -101,7 +101,7 @@ def desliga_led():
         # 1️⃣ Pegar o último estado do LED
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT estado FROM "LED" ORDER BY id DESC LIMIT 1')
+                cur.execute('SELECT estado FROM led ORDER BY id DESC LIMIT 1')
                 result = cur.fetchone()
 
         if result and result[0]:  # Se o LED está ligado
