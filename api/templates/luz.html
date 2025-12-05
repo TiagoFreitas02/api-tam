@@ -2,33 +2,53 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Controle do LED</title>
+    <title>Valores da Luz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        form {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<h1>Controle do LED</h1>
 
-<button onclick="toggleLED()">Alternar LED</button>
+<h2>Valores de Luz</h2>
 
-<p id="msg"></p>
+<table>
+    <tr>
+        <th>Valor</th>
+        <th>Timestamp</th>
+    </tr>
 
-<script>
-const apiURL = "http://127.0.0.1:5000"; // seu servidor Flask local
+    {% for valor, ts in valores %}
+    <tr>
+        <td>{{ valor }}</td>
+        <td>{{ ts.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</form>
 
-function toggleLED() {
-    fetch(`${apiURL}/led`, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({comando: "T"})
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("msg").innerText = 
-            data.status === "ok" ? "LED alternado com sucesso!" : `Erro: ${data.msg}`;
-    })
-    .catch(err => {
-        document.getElementById("msg").innerText = `Erro: ${err}`;
-    });
-}
-</script>
 </body>
 </html>
