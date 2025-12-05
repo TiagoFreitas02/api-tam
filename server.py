@@ -48,7 +48,6 @@ def ler_valor_mais_recente(arduino):
     ultimo_valor = None
 
     # Ler TODAS as linhas disponíveis no buffer, guardar apenas a última
-    # Isto descarta dados antigos e garante que temos o valor em tempo real
     while arduino.in_waiting > 0:
         linha = arduino.readline().decode(errors="ignore").strip()
         if linha and linha.isdigit():
@@ -99,7 +98,7 @@ def enviar_comando_arduino(comando):
     try:
         if arduino_serial and arduino_serial.is_open:
             arduino_serial.write((comando + "\n").encode())
-            time.sleep(0.1)  # Pequeno delay para Arduino processar
+            time.sleep(0.1)  # Pequeno delay para Arduino ter tempo de
             return True
         return False
     except Exception as e:

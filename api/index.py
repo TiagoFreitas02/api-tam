@@ -11,7 +11,7 @@ db_config = {
 }
 
 # Número máximo de registos a mostrar no histórico
-MAX_RECORDS = 50
+linhas_mostradas = 50
 
 
 def get_db_connection():
@@ -33,7 +33,7 @@ def guardar_valor_de_luz(valor_de_luz):
         return False
 
 
-def get_valores_de_luz(limit=MAX_RECORDS):
+def get_valores_de_luz(limit=linhas_mostradas):
     try:
         # Usar 'with' garante que a conexão é fechada automaticamente
         with get_db_connection() as connection:
@@ -101,29 +101,8 @@ def receber_luz():
             400,
         )
 
-    # Validação: verificar tipo e intervalo
-    try:
-        light_value = int(light_value)
-        if not (0 <= light_value <= 100):
-            return (
-                jsonify(
-                    {
-                        "status": "error",
-                        "message": "light_value deve estar entre 0 e 100",
-                    }
-                ),
-                400,
-            )
-    except Exception as e:
-        return (
-            jsonify(
-                {
-                    "status": "error",
-                    "message": f"light_value deve ser um número inteiro: {e}",
-                }
-            ),
-            400,
-        )
+    light_value = int(light_value)
+        
 
     # Guardar na base de dados
     success = guardar_valor_de_luz(light_value)
@@ -146,13 +125,13 @@ def receber_luz():
 
 @app.route("/")
 def mostrar_luz():
-    valores = get_valores_de_luz(limit=MAX_RECORDS)
+    valores = get_valores_de_luz(limit=linhas_mostradas)
     return render_template("luz.html", valores=valores)
 
 
 @app.route("/led", methods=["POST"])
 def controlar_led():
-    """Endpoint para controlar o LED. Recebe estado no body: 0=auto, 1=on, 2=off"""
+    """Endpoint para controlar o LED. Recebe estado no 0=auto, 1=on, 2=off"""
     data = request.get_json()
 
     if not data:
@@ -181,13 +160,17 @@ def controlar_led():
             400,
         )
 
-    if atualizar_estado_led(estado):
-        mensagens = {
-            0: "LED voltará ao modo automático em breve",
-            1: "LED será ligado em breve",
-            2: "LED será desligado em breve",
-        }
-        return jsonify({"status": "ok", "message": mensagens[estado]})
+    if atualizar_estado_led(estado) == True:
+        if estado == 0:
+            return jsonify({ "message": "automatico" })
+        if estado ==1:
+            return jsonify({ "message": "ligado" })
+        if estado ==2:
+            return jsonify({ "message": "desligado" })
+        else:
+            return jsonify({"message": "invalido"})
+
+    
 
     return (
         jsonify({"status": "error", "message": "Erro ao atualizar estado do LED"}),
