@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template  # render_template adicionado para HTML
-import os
+import serial
 import psycopg2
+import time
 
 app = Flask(__name__)
 
@@ -10,6 +11,14 @@ db_config = {
     'password':'a2021153107',
     'host': 'aid.estgoh.ipc.pt'
 }
+
+try:
+    arduino = serial.Serial(port="COM3", baudrate=9600, timeout=1)
+    time.sleep(2)
+    print("Arduino conectado com sucesso!")
+except Exception as e:
+    print("Erro ao abrir a porta serial:", e)
+    arduino = None
 
 def save_light_value(light_value):
     try:
@@ -47,6 +56,31 @@ def receber_luz():
         return jsonify({"status": "ok", "light_value": light_value})
     else:
         return jsonify({"status": "error", "message": "Erro ao guardar na BD"}), 500
+    
+@app.route('/led', methods=['POST'])
+def controlar_led():
+    data = request.get_json()
+    if not data:
+        return jsonify({"status": "erro", "msg": "Dados JSON não recebidos"}), 400
+
+    estado = data.get("estado")
+    if estado not in ["0", "1", "A"]:
+        return jsonify({"status": "erro", "msg": "estado inválido"}), 400
+
+    # Verifica se o Arduino está conectado
+    if arduino is None:
+        return jsonify({"status": "erro", "msg": "Arduino não conectado"}), 500
+
+    try:
+        # Envia comando para o Arduino
+        arduino.write(str(estado).encode('utf-8'))
+        arduino.flush()
+        return jsonify({"status": "ok", "estado": estado})
+    except Exception as e:
+        # Captura erros na comunicação serial
+        return jsonify({"status": "erro", "msg": f"Erro ao comunicar com Arduino: {e}"}), 500
+
+
 
 
 @app.route('/')
