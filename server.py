@@ -116,11 +116,10 @@ def verificar_e_processar_comando_led():
 
     # Se o estado não mudou, não fazer nada
     if estado_int == ultimo_estado_processado:
+        print("Estado nao mudado")
         return
 
-    # Mapear INTEGER para comando Serial
-    # 0 = auto, 1 = on, 2 = off
-
+    print(estado_int)
     sucesso = False
     if estado_int == 0:
         sucesso = enviar_comando_arduino("LED:AUTO")
