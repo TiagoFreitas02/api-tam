@@ -73,7 +73,7 @@ def enviar_para_api(valor):
         if response.status_code == 200:
             return True
         else:
-            print(f"API respondeu: {response}")
+            print(f"API respondeu: {response.json()}")
             return False
     except Exception as e:
         print(f"Erro ao enviar: {e}")
@@ -108,6 +108,7 @@ def enviar_comando_arduino(comando):
 
 
 def verificar_e_processar_comando_led():
+    global ultimo_estado_processado
     estado_int = ler_estado_led_bd()
 
     if estado_int is None:
@@ -141,6 +142,7 @@ def verificar_e_processar_comando_led():
 
 def main():
     print("Boa tarde a tpods!")
+    global arduino_serial, ultimo_estado_processado
     # Tentar detectar automaticamente ou usar configuração
     porta_usar = PORTA
     arduino_serial = conectar_arduino(porta_usar, BAUD)
