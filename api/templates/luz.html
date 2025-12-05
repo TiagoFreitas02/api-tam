@@ -1,3 +1,6 @@
+<form action="/toggle_led" method="post">
+    <button type="submit">LED</button>
+</form>
 <table>
     <tr>
         <th>Valor</th>
@@ -12,9 +15,7 @@
     {% endfor %}
 </table>
 
-<form action="/toggle_led" method="post">
-    <button type="submit">LED</button>
-</form>
+
 
 {% if msg %}
 <p>{{ msg }}</p>
