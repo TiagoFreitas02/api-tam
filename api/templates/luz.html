@@ -1,3 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Controle do LED</title>
+</head>
+<body>
+
+<h1>Controle do LED</h1>
+
+<!-- Botões para controlar o LED -->
+<button onclick="controlarLED('1')">Ligar LED</button>
+<button onclick="controlarLED('0')">Desligar LED</button>
+<button onclick="controlarLED('A')">Automático</button>
+
+<!-- Mensagem de status -->
+<p id="msg"></p>
+
+<!-- Tabela com valores do sensor -->
 <table>
     <tr>
         <th>Valor</th>
@@ -10,3 +29,28 @@
     </tr>
     {% endfor %}
 </table>
+
+<!-- Script JS para enviar comandos ao Flask via ngrok -->
+<script>
+const ngrokURL = "https://unfamiliarised-semiretired-damion.ngrok-free.dev"; // URL do ngrok
+
+function controlarLED(estado) {
+    fetch(`${ngrokURL}/led`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: estado })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("msg").innerText = data.status === "ok" 
+            ? `LED atualizado: ${estado}` 
+            : `Erro: ${data.msg}`;
+    })
+    .catch(err => {
+        document.getElementById("msg").innerText = `Erro: ${err}`;
+    });
+}
+</script>
+
+</body>
+</html>
