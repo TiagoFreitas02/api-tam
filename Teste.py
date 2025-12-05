@@ -30,7 +30,7 @@ while True:
         # Consulta estado do LED na BD
         resp = requests.get(API_ESTADO_URL, timeout=5)
         resp_json = resp.json()
-        estado_bd = bool(resp_json.get("led", False))  # força boolean
+        estado_bd = resp_json.get("led", False)
 
         # Envia comando se diferente do Arduino ou se nunca enviado
         if estado_bd != ultimo_estado:
