@@ -35,7 +35,7 @@ def conectar_arduino(porta, baud):
         )  # Timeout curto para não bloquear
         time.sleep(2)  # Esperar Arduino reiniciar
         arduino.reset_input_buffer()  # Limpar buffer inicial
-        print(f"Conectado ao arduino")
+        print("Conectado ao arduino")
         return arduino
     except Exception as e:
         print(f"Falha: {e}")
@@ -106,20 +106,20 @@ def enviar_comando_arduino(comando):
         return False
 
 
-def verificar_e_processar_comando_led():
+def verificar_e_processar_comando_led(forcar_envio=False):
     global ultimo_estado_processado
     estado_int = ler_estado_led_bd()
 
     if estado_int is None:
         print("Li mal o estado do led")
-        return  # Erro ao ler
+        return  
 
-    # Se o estado não mudou, não fazer nada
-    if estado_int == ultimo_estado_processado:
-        print("Estado nao mudado")
+    # Se o estado não mudou e não estamos a forçar, não fazer nada
+    if not forcar_envio and estado_int == ultimo_estado_processado:
+        print("Estado nao mudado e nao foi forçado o envio")
         return
 
-    print(estado_int)
+    print(f"Estado do led: {estado_int}")
     sucesso = False
     if estado_int == 0:
         sucesso = enviar_comando_arduino("LED:AUTO")
@@ -127,7 +127,6 @@ def verificar_e_processar_comando_led():
         sucesso = enviar_comando_arduino("LED:ON")
     else:
         sucesso = enviar_comando_arduino("LED:OFF")
-
 
     # Enviar comando ao Arduino
     if sucesso:
@@ -148,12 +147,8 @@ def main():
         print("Arduino nao conectado")
         return
 
-    estado_inicial = ler_estado_led_bd()
-    if estado_inicial is not None:
-        ultimo_estado_processado = estado_inicial
-        print(
-            f"Estado LED inicial: {ultimo_estado_processado} (0=auto, 1=on, 2=off)"
-        )
+    # Enviar o comando inicial ao Arduino (forçar envio mesmo que seja o mesmo estado) para garantir que o arduino esta a par da bd
+    verificar_e_processar_comando_led(forcar_envio=True)
 
     ultimo_envio = 0
     ultima_verificacao_led = 0
@@ -177,13 +172,9 @@ def main():
                 if agora - ultimo_envio >= MIN_SEND_INTERVAL:
                     # Tentar enviar para a API
                     if enviar_para_api(valor):
-                        print(
-                            f"Luz: {valor} - Enviado para a base de dados"
-                        )
+                        print(f"Luz: {valor} - Enviado para a base de dados")
                     else:
-                        print(
-                            f"Luz: {valor} - Falhou a enviar"
-                        )
+                        print(f"Luz: {valor} - Falhou a enviar")
 
                     ultimo_envio = agora
 
