@@ -89,32 +89,21 @@ def ler_estado_led_bd():
                     estado = result[0]  # Retorna o INTEGER
                     return estado
                 else:
-                    print("[BD] AVISO: Tabela controlo_led está vazia")
+                    print("BD AVISO: Tabela controlo_led está vazia")
         return None
     except Exception as e:
-        print(f"[BD] ERRO ao ler estado LED da BD: {e}")
+        print(f"BD ERRO ao ler estado LED da BD: {e}")
         return None
 
 
 # Os comandos podem ser "LED:AUTO", "LED:ON", "LED:OFF"
 def enviar_comando_arduino(comando):
-    try:
-        if arduino_serial is None:
-            print("[ARDUINO] ERRO: Arduino não está conectado (arduino_serial é None)")
-            return False
-        if not arduino_serial.is_open:
-            print("[ARDUINO] ERRO: Porta serial não está aberta")
-            return False
-
-        comando_bytes = (comando + "\n").encode()
-        arduino_serial.write(comando_bytes)
-        arduino_serial.flush()  # Garantir que o comando foi enviado
-        time.sleep(0.1)  # Pequeno delay para Arduino ter tempo de processar
-        print(f"[ARDUINO] Comando '{comando}' escrito na serial")
-        return True
-    except Exception as e:
-        print(f"[ARDUINO] ERRO ao enviar comando '{comando}' ao Arduino: {e}")
-        return False
+    comando_bytes = (comando + "\n").encode()
+    arduino_serial.write(comando_bytes)
+    arduino_serial.flush()  # Garantir que o comando foi enviado
+    time.sleep(0.1)  # Pequeno delay para Arduino ter tempo de processar
+    print(f"[ARDUINO] Comando '{comando}' escrito na serial")
+    return True
 
 
 def verificar_e_processar_comando_led(forcar_envio=False):
@@ -130,7 +119,7 @@ def verificar_e_processar_comando_led(forcar_envio=False):
         return  # Estado não mudou, não fazer nada
 
     print(
-        f"[LED] Estado lido da BD: {estado_int} (último processado: {ultimo_estado_processado})"
+        f"LED Estado lido da BD: {estado_int} (último processado: {ultimo_estado_processado})"
     )
     sucesso = False
     comando = ""
