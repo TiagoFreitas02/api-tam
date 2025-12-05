@@ -13,28 +13,36 @@ db_config = {
 # Número máximo de registos a mostrar no histórico
 MAX_RECORDS = 50
 
-connection = psycopg2.connect(**db_config)
+
+def get_db_connection():
+    """Cria uma nova conexão com a base de dados.
+    IMPORTANTE: Sempre usar com 'with' para garantir que a conexão é fechada."""
+    return psycopg2.connect(**db_config)
+
 
 def guardar_valor_de_luz(valor_de_luz):
     try:
-        with connection.cursor() as cur:
-            cur.execute("INSERT INTO luz (valor) VALUES (%s)", (valor_de_luz,))
-        connection.commit()
+        # Usar 'with' garante que a conexão é fechada automaticamente
+        with get_db_connection() as connection:
+            with connection.cursor() as cur:
+                cur.execute("INSERT INTO luz (valor) VALUES (%s)", (valor_de_luz,))
+            connection.commit()
         return True
     except Exception as e:
         print(f"Erro ao guardar na BD: {e}")
-        connection.rollback()
         return False
 
 
 def get_valores_de_luz(limit=MAX_RECORDS):
     try:
-        with connection.cursor() as cur:
-            # LIMIT para evitar carregar todos os registos (performance)
-            cur.execute(
-                "SELECT valor, data FROM luz ORDER BY id DESC LIMIT %s", (limit,)
-            )
-            results = cur.fetchall()
+        # Usar 'with' garante que a conexão é fechada automaticamente
+        with get_db_connection() as connection:
+            with connection.cursor() as cur:
+                # LIMIT para evitar carregar todos os registos (performance)
+                cur.execute(
+                    "SELECT valor, data FROM luz ORDER BY id DESC LIMIT %s", (limit,)
+                )
+                results = cur.fetchall()
         return results  # agora devolve lista de (valor, timestamp) ordenados por mais recente
     except Exception as e:
         print(f"Erro ao pesquisar na BD: {e}")
@@ -48,26 +56,28 @@ def atualizar_estado_led(estado_int):
         return False
 
     try:
-        with connection.cursor() as cur:
-            # Verificar se existe registo
-            cur.execute("SELECT COUNT(*) FROM controlo_led")
-            count = cur.fetchone()[0]
+        # Usar 'with' garante que a conexão é fechada automaticamente
+        with get_db_connection() as connection:
+            with connection.cursor() as cur:
+                # Verificar se existe registo
+                cur.execute("SELECT COUNT(*) FROM controlo_led")
+                count = cur.fetchone()[0]
 
-            if count == 0:
-                # Inserir primeiro registo
-                cur.execute(
-                    "INSERT INTO controlo_led (estado) VALUES (%s)", (estado_int,)
-                )
-            else:
-                # Atualizar estado existente
-                cur.execute("UPDATE controlo_led SET estado = %s", (estado_int,))
+                if count == 0:
+                    # Inserir primeiro registo
+                    cur.execute(
+                        "INSERT INTO controlo_led (estado) VALUES (%s)", (estado_int,)
+                    )
+                else:
+                    # Atualizar estado existente
+                    cur.execute("UPDATE controlo_led SET estado = %s", (estado_int,))
 
-        connection.commit()
+            connection.commit()
         return True
     except Exception as e:
         print(f"Erro ao atualizar estado LED: {e}")
-        connection.rollback()
         return False
+
 
 @app.route("/luz", methods=["POST"])
 def receber_luz():
@@ -104,10 +114,13 @@ def receber_luz():
                 ),
                 400,
             )
-    except:
+    except Exception as e:
         return (
             jsonify(
-                {"status": "error", "message": "light_value deve ser um número inteiro"}
+                {
+                    "status": "error",
+                    "message": f"light_value deve ser um número inteiro: {e}",
+                }
             ),
             400,
         )
@@ -180,6 +193,7 @@ def controlar_led():
         jsonify({"status": "error", "message": "Erro ao atualizar estado do LED"}),
         500,
     )
+
 
 if __name__ == "__main__":
     print("Programa iniciado")
