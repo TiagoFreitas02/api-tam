@@ -86,24 +86,24 @@ def ler_estado_led_bd():
                 cur.execute("SELECT estado FROM controlo_led LIMIT 1")
                 result = cur.fetchone()
                 if result:
-                    return result[0]  # Retorna o INTEGER
+                    estado = result[0]  # Retorna o INTEGER
+                    return estado
+                else:
+                    print("BD AVISO: Tabela controlo_led está vazia")
         return None
     except Exception as e:
-        print(f"Erro ao ler estado LED da BD: {e}")
+        print(f"BD ERRO ao ler estado LED da BD: {e}")
         return None
 
 
 # Os comandos podem ser "LED:AUTO", "LED:ON", "LED:OFF"
 def enviar_comando_arduino(comando):
-    try:
-        if arduino_serial and arduino_serial.is_open:
-            arduino_serial.write((comando + "\n").encode())
-            time.sleep(0.1)  # Pequeno delay para Arduino ter tempo de
-            return True
-        return False
-    except Exception as e:
-        print(f"Erro ao enviar comando ao Arduino: {e}")
-        return False
+    comando_bytes = (comando + "\n").encode()
+    arduino_serial.write(comando_bytes)
+    arduino_serial.flush()  # Garantir que o comando foi enviado
+    time.sleep(0.1)  # Pequeno delay para Arduino ter tempo de processar
+    print(f"[ARDUINO] Comando '{comando}' escrito na serial")
+    return True
 
 
 def verificar_e_processar_comando_led(forcar_envio=False):
@@ -111,30 +111,39 @@ def verificar_e_processar_comando_led(forcar_envio=False):
     estado_int = ler_estado_led_bd()
 
     if estado_int is None:
-        print("Li mal o estado do led")
-        return  
+        print("ERRO: Não consegui ler o estado do LED da base de dados")
+        return  # Erro ao ler
 
     # Se o estado não mudou e não estamos a forçar, não fazer nada
     if not forcar_envio and estado_int == ultimo_estado_processado:
-        print("Estado nao mudado e nao foi forçado o envio")
+        return  # Estado não mudou, não fazer nada
+
+    print(
+        f"LED Estado lido da BD: {estado_int} (último processado: {ultimo_estado_processado})"
+    )
+    sucesso = False
+    comando = ""
+    if estado_int == 0:
+        comando = "LED:AUTO"
+    elif estado_int == 1:
+        comando = "LED:ON"
+    elif estado_int == 2:
+        comando = "LED:OFF"
+    else:
+        print(f"Estado inválido: {estado_int}")
         return
 
-    print(f"Estado do led: {estado_int}")
-    sucesso = False
-    if estado_int == 0:
-        sucesso = enviar_comando_arduino("LED:AUTO")
-    elif estado_int == 1:
-        sucesso = enviar_comando_arduino("LED:ON")
-    else:
-        sucesso = enviar_comando_arduino("LED:OFF")
+    sucesso = enviar_comando_arduino(comando)
 
     # Enviar comando ao Arduino
     if sucesso:
-        print(f"Comando LED enviado: {estado_int}")
+        print(
+            f"Comando '{comando}' enviado com sucesso ao Arduino (estado={estado_int})"
+        )
         # Guardar estado processado
         ultimo_estado_processado = estado_int
     else:
-        print(f"Falha ao enviar comando LED: {estado_int}")
+        print(f"FALHA ao enviar comando '{comando}' ao Arduino (estado={estado_int})")
 
 
 def main():
@@ -147,7 +156,7 @@ def main():
         print("Arduino nao conectado")
         return
 
-    # Enviar o comando inicial ao Arduino (forçar envio mesmo que seja o mesmo estado) para garantir que o arduino esta a par da bd
+    # Enviar o comando inicial ao Arduino (forçar envio mesmo que seja o mesmo estado)
     verificar_e_processar_comando_led(forcar_envio=True)
 
     ultimo_envio = 0

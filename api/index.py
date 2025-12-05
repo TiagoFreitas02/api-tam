@@ -16,7 +16,7 @@ linhas_mostradas = 50
 
 def get_db_connection():
     """Cria uma nova conexão com a base de dados.
-    IMPORTANTE: Sempre usar com 'with' para garantir que a conexão é fechada."""
+     usar com with para garantir que a conexão é fechada."""
     return psycopg2.connect(**db_config)
 
 
