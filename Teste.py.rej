@@ -1,0 +1,19 @@
+diff a/Teste.py b/Teste.py	(rejected hunks)
+@@ -32,14 +32,16 @@
+         # 3️⃣ Consulta o estado atual do LED na BD (único registro)
+         resp = requests.get(API_ESTADO_URL, timeout=5)
+         resp_json = resp.json()
+-        estado_bd = resp_json.get("led", False)
++        estado_bd = resp_json.get("led")
+         
+         # 4️⃣ Se o estado na BD for diferente do Arduino, envia comando Serial
+         if estado_bd != ultimo_estado:
++            print(f"Estado BD: {estado_bd}, último enviado: {ultimo_estado}")
+             cmd = "LED_ON\n" if estado_bd else "LED_OFF\n"
+             arduino.write(cmd.encode())
+             print(f"Enviado comando para Arduino: {cmd.strip()}")
+             ultimo_estado = estado_bd
++            
+ 
+         time.sleep(1)  # evita polling muito rápido
+ 
