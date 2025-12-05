@@ -2,13 +2,16 @@ import serial
 import requests
 import time
 
-API_URL = "https://api-tam.vercel.app/luz"
+# URL da API (Vercel ou ngrok)
+API_URL = "https://unfamiliarised-semiretired-damion.ngrok-free.dev/luz"
+
+# Configuração da porta serial do Arduino
 PORTA = "COM3"
 BAUD = 9600
 
-# Inicialização do Arduino
+# Inicializa Arduino
 try:
-    arduino = serial.Serial(port=PORTA, baudrate=BAUD, timeout=1)
+    arduino = serial.Serial(PORTA, BAUD, timeout=1)
     time.sleep(2)
     print("Arduino conectado com sucesso!")
 except Exception as e:
@@ -18,26 +21,21 @@ except Exception as e:
 while True:
     try:
         linha = arduino.readline().decode(errors="ignore").strip()
-        
+
+        # Ignora linhas vazias
         if not linha:
             continue
 
-        print(f"Recebido do Arduino: {linha}")
+        # Lê apenas linhas com prefixo VAL:
+        if linha.startswith("VAL:"):
+            valor = int(linha.replace("VAL:", ""))
+            print(f"Lido do Arduino: {valor}")
 
-        # Tenta converter para número
-        try:
-            valor = int(linha)
-        except ValueError:
-            time.sleep(0.1)
-            continue  # ignora linhas inválidas
-
-        print(f"Lido do Arduino: {valor}")
-
-        # Envio com timeout para não bloquear
-        try:
-            requests.post(API_URL, json={"light_value": valor}, timeout=3)
-        except requests.RequestException as e:
-            print("Erro ao enviar para API:", e)
+            # Envio para API
+            try:
+                requests.post(API_URL, json={"light_value": valor}, timeout=3)
+            except requests.RequestException as e:
+                print("Erro ao enviar para API:", e)
 
     except Exception as e:
         print("Erro geral:", e)
