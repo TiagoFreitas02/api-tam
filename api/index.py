@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template 
 import os
 import psycopg2
+import requests
 
 app = Flask(__name__)
 
@@ -99,19 +100,25 @@ def comando_led():
 @app.route('/toggle_led', methods=['POST'])
 def toggle_led():
     try:
+        # Lê estado atual
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cur:
                 cur.execute('SELECT estado FROM led WHERE id = 1')
                 result = cur.fetchone()
         
         estado_atual = result[0] if result else False
-        print("Estado atual:", estado_atual)  # DEBUG
         novo_estado = not estado_atual
-        print("Novo estado:", novo_estado)  # DEBUG
 
-        # Atualiza o estado
+        # Atualiza BD
         sucesso = save_led_state(novo_estado)
-        print("Atualizou BD:", sucesso)  # DEBUG
+        print("Atualizou BD:", sucesso)
+
+        # Envia comando para Arduino imediatamente
+        try:
+            requests.post(ARDUINO_API_URL, json={"led": novo_estado}, timeout=2)
+            print(f"Comando enviado para Arduino: {'LED_ON' if novo_estado else 'LED_OFF'}")
+        except Exception as e:
+            print("Erro ao enviar comando para Arduino:", e)
 
         valores = get_light_values()
         msg = f"LED {'ligado' if novo_estado else 'desligado'}"
