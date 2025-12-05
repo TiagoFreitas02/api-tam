@@ -1,15 +1,8 @@
-<form action="/toggle_led" method="post">
-    <button type="submit">LED</button>
-{% if msg %}
-<p>{{ msg }}</p>
-{% endif %}
-</form>
 <table>
     <tr>
         <th>Valor</th>
         <th>Timestamp</th>
     </tr>
-
     {% for valor, ts in valores %}
     <tr>
         <td>{{ valor }}</td>
@@ -17,8 +10,3 @@
     </tr>
     {% endfor %}
 </table>
-
-
-
-
-
