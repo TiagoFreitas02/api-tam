@@ -30,7 +30,7 @@ while True:
         # Consulta estado do LED na BD
         resp = requests.get(API_ESTADO_URL, timeout=5)
         resp_json = resp.json()
-        estado_bd = resp_json.get("led", False)
+        estado_bd = resp_json.get("led")
 
         # Envia comando se diferente do Arduino ou se nunca enviado
         if estado_bd != ultimo_estado:
@@ -38,9 +38,6 @@ while True:
             arduino.write(cmd.encode())
             print(f"Enviado comando para Arduino: {cmd.strip()}")
             ultimo_estado = estado_bd
-
-        time.sleep(0.2)  # loop mais rápido
-
     except Exception as e:
         print("Erro:", e)
         time.sleep(2)
