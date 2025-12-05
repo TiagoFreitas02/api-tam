@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-import os
 import psycopg2
 import serial  # para comunicação com o Arduino
 
