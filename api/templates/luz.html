@@ -1,5 +1,8 @@
 <form action="/toggle_led" method="post">
     <button type="submit">LED</button>
+{% if msg %}
+<p>{{ msg }}</p>
+{% endif %}
 </form>
 <table>
     <tr>
@@ -17,7 +20,5 @@
 
 
 
-{% if msg %}
-<p>{{ msg }}</p>
-{% endif %}
+
 
