@@ -81,8 +81,6 @@ def controlar_led():
         return jsonify({"status": "erro", "msg": f"Erro ao comunicar com Arduino: {e}"}), 500
 
 
-
-
 @app.route('/')
 def mostrar_luz():
     valores = get_light_values()
